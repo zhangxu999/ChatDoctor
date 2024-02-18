@@ -1,0 +1,63 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "accelerate",
+            "type": "python",
+            "request": "launch",
+            "module": "accelerate.commands.launch",
+            "cwd": "/root/ChatDoctor",
+            "args": [
+                "--config_file", "ds_stage/ds_stage2_2gpu.yaml", 
+                "train.py",
+                "--model_name_or_path","/root/autodl-tmp/llama2-7b",
+                "--data_path","data/HealthCareMagic-1k.json",
+                "--output_dir", "/root/autodl-tmp/full_train_models_1k/",
+                "--num_train_epochs", "1", 
+                "--per_device_train_batch_size", "2", 
+                "--per_device_eval_batch_size", "4", 
+                "--gradient_accumulation_steps", "4", 
+                "--evaluation_strategy", "no", 
+                "--save_strategy", "steps", 
+                "--save_steps", "20", 
+                "--save_total_limit", "1", 
+                "--learning_rate", "2e-6", 
+                "--weight_decay", "0.", 
+                "--warmup_ratio", "0.03", 
+                "--lr_scheduler_type", "cosine", 
+                "--logging_steps", "1",
+                "--fp16", "True"
+            ],
+            "justMyCode": false
+        },
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "--model_name_or_path",
+                "/mnt/workspace/t5-3b/",
+                "--do_train",
+                "--do_eval",
+                "--dataset_name",
+                "cnn_dailymail",
+                "--dataset_config",
+                "3.0.0",
+                "--source_prefix",
+                "summarize: ",
+                "--output_dir",
+                "/tmp/tst-summarization",
+                "--per_device_train_batch_size=4",
+                "--per_device_eval_batch_size=4",
+                "--overwrite_output_dir",
+                "--predict_with_generate"
+            ]
+        }
+    ]
+}
