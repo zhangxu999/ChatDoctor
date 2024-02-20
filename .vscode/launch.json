@@ -11,7 +11,7 @@
             "module": "accelerate.commands.launch",
             "cwd": "/root/ChatDoctor",
             "args": [
-                "--config_file", "ds_stage/ds_stage2_2gpu.yaml", 
+                "--config_file", "ds_stage/ds_stage3_2gpu.yaml", 
                 "train.py",
                 "--model_name_or_path","/root/autodl-tmp/llama2-7b",
                 "--data_path","data/HealthCareMagic-1k.json",
