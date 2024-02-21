@@ -13,6 +13,13 @@ Unused imports:
 import torch.nn as nn
 import bitsandbytes as bnb
 """
+import os
+proxy = 'http://127.0.0.1:7890'
+os.environ['http_proxy'] = proxy 
+os.environ['HTTP_PROXY'] = proxy
+os.environ['https_proxy'] = proxy
+os.environ['HTTPS_PROXY'] = proxy
+
 from peft import (  # noqa: E402
     LoraConfig,
     # BottleneckConfig,
@@ -62,6 +69,7 @@ def train(
         wandb_watch: str = "",  # options: false | gradients | all
         wandb_log_model: str = "",  # options: false | true
         resume_from_checkpoint: str = None,  # either training checkpoint or final adapter
+        load_best_model_at_end: bool = False,
 ):
     print(
         f"Finetuning model with params:\n"
@@ -94,6 +102,7 @@ def train(
         f"wandb_watch: {wandb_watch}\n"
         f"wandb_log_model: {wandb_log_model}\n"
         f"resume_from_checkpoint: {resume_from_checkpoint}\n"
+        f"load_best_model_at_end: {load_best_model_at_end}\n"
     )
     assert (
         base_model
@@ -125,12 +134,13 @@ def train(
         torch_dtype=torch.float16,
         device_map=device_map,
     )
-
+    print("model.config.model_type:",model.config.model_type)
     if model.config.model_type == "LLaMA":
         # Due to the name of transformers' LLaMATokenizer, we have to do this
         tokenizer = LlamaTokenizer.from_pretrained(base_model)
     else:
-        tokenizer = AutoTokenizer.from_pretrained(base_model)
+        # tokenizer = AutoTokenizer.from_pretrained(base_model)
+        tokenizer = LlamaTokenizer.from_pretrained(base_model)
 
     tokenizer.pad_token_id = (
         0  # unk. we want this to be different from the eos token
@@ -276,12 +286,12 @@ def train(
     )
     model.config.use_cache = False
 
-    old_state_dict = model.state_dict
-    model.state_dict = (
-        lambda self, *_, **__: get_peft_model_state_dict(
-            self, old_state_dict()
-        )
-    ).__get__(model, type(model))
+    # old_state_dict = model.state_dict
+    # model.state_dict = (
+    #     lambda self, *_, **__: get_peft_model_state_dict(
+    #         self, old_state_dict()
+    #     )
+    # ).__get__(model, type(model))
 
     if torch.__version__ >= "2" and sys.platform != "win32":
         model = torch.compile(model)
@@ -320,4 +330,3 @@ def generate_prompt(data_point):
 
 if __name__ == "__main__":
     fire.Fire(train)
-qq
