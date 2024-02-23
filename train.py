@@ -178,7 +178,8 @@ class DataCollatorForSupervisedDataset(object):
     def __call__(self, instances: Sequence[Dict]) -> Dict[str, torch.Tensor]:
         input_ids, labels = tuple([instance[key] for instance in instances] for key in ("input_ids", "labels"))
         input_ids = torch.nn.utils.rnn.pad_sequence(
-            input_ids, batch_first=True, padding_value=self.tokenizer.pad_token_id
+            # input_ids, batch_first=True, padding_value=self.tokenizer.pad_token_id
+            input_ids, batch_first=True, padding_value=self.tokenizer.eos_token_id
         )
         labels = torch.nn.utils.rnn.pad_sequence(labels, batch_first=True, padding_value=IGNORE_INDEX)
         return dict(
@@ -214,10 +215,12 @@ def train():
     )
     if tokenizer.pad_token is None:
         smart_tokenizer_and_embedding_resize(
-            special_tokens_dict=dict(pad_token=DEFAULT_PAD_TOKEN),
+            # special_tokens_dict=dict(pad_token=DEFAULT_PAD_TOKEN),
+            special_tokens_dict={},
             tokenizer=tokenizer,
             model=model,
         )
+        tokenizer.pad_token = tokenizer.eos_token
     if "llama" in model_args.model_name_or_path:
         tokenizer.add_special_tokens(
             {
